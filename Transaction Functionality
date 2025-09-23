@@ -1,0 +1,29 @@
+/* ==========================
+   Transactions (double-entry)
+   ========================== */
+function addTransaction(date, desc, debit, credit, amount) {
+  if (!date || !desc || !debit || !credit || !amount) { alert("Fill all fields"); return; }
+  if (!getAccountType(debit) || !getAccountType(credit)) { alert("Add the accounts first"); return; }
+  transactions.push({ date, desc, debit, credit, amount: Number(amount) });
+  saveAll();
+  updateTransactionUI();
+}
+
+function addTransactionWrapper() {
+  const date = document.getElementById("transactionDate").value;
+  const desc = document.getElementById("transactionDesc").value.trim();
+  const debit = document.getElementById("debitAccount").value;
+  const credit = document.getElementById("creditAccount").value;
+  const amount = parseFloat(document.getElementById("transactionAmount").value);
+  addTransaction(date, desc, debit, credit, amount ? amount : 0);
+  document.getElementById("transactionDate").value = "";
+  document.getElementById("transactionDesc").value = "";
+  document.getElementById("transactionAmount").value = "";
+}
+
+function resetTransactions() {
+  if (!confirm("Reset all transactions?")) return;
+  transactions = [];
+  saveAll();
+  updateTransactionUI();
+}
