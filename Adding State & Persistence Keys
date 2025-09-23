@@ -1,0 +1,15 @@
+/* ======= State & Persistence Keys ======= */
+const KEY_ACCOUNTS = "pp_accounts_v1";
+const KEY_TRANSACTIONS = "pp_transactions_v1";
+const KEY_STOCK = "pp_stock_v1";            // array of stock items with opening, qty, price, closing
+const KEY_STOCK_HISTORY = "pp_stock_hist_v1"; // array of {date,item,opening,closing,consumed,valueOpening,valueClosing}
+const KEY_SHIFT = "pp_shift_v1";
+
+let accounts = [];
+let transactions = [];
+let stock = [];
+let stockHistory = []; // historical closing entries
+let charts = [];
+let allTimeChart = null;
+let shiftReport = {};
+let cashOnHand = 0;
