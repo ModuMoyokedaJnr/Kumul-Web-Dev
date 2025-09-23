@@ -1,0 +1,37 @@
+/* ==========================
+   Excel import (transactions)
+   expects sheet named "Transactions" with columns:
+   Date | Description | Debit Account | Credit Account | Amount
+   ========================== */
+function importExcel() {
+  const file = document.getElementById("excelFile").files[0];
+  if (!file) { alert("Select Excel file"); return; }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: "array" });
+    wb.SheetNames.forEach(sheetName => {
+      const sheet = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet);
+      if (sheetName.toLowerCase() === "transactions") {
+        rows.forEach(r => {
+          const d = r["Date"] || r["date"];
+          const desc = r["Description"] || r["description"];
+          const dr = r["Debit Account"] || r["debit account"];
+          const cr = r["Credit Account"] || r["credit account"];
+          const amt = Number(r["Amount"] || r["amount"] || 0);
+          if (!dr || !cr || !d) return;
+          if (!getAccountType(dr) || !getAccountType(cr)) {
+            console.warn("Skipping transaction; missing account:", r);
+            return;
+          }
+          transactions.push({ date: d, desc, debit: dr, credit: cr, amount: amt });
+        });
+      }
+    });
+    saveAll();
+    updateTransactionUI();
+    alert("Excel imported.");
+  };
+  reader.readAsArrayBuffer(file);
+}
