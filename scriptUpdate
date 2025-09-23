@@ -1,0 +1,78 @@
+/* ======= Helpers: load/save state ======= */
+function saveAll() {
+  localStorage.setItem(KEY_ACCOUNTS, JSON.stringify(accounts));
+  localStorage.setItem(KEY_TRANSACTIONS, JSON.stringify(transactions));
+  localStorage.setItem(KEY_STOCK, JSON.stringify(stock));
+  localStorage.setItem(KEY_STOCK_HISTORY, JSON.stringify(stockHistory));
+  localStorage.setItem(KEY_SHIFT, JSON.stringify(shiftReport));
+}
+
+function loadAll() {
+  try {
+    accounts = JSON.parse(localStorage.getItem(KEY_ACCOUNTS)) || [];
+    transactions = JSON.parse(localStorage.getItem(KEY_TRANSACTIONS)) || [];
+    stock = JSON.parse(localStorage.getItem(KEY_STOCK)) || [];
+    stockHistory = JSON.parse(localStorage.getItem(KEY_STOCK_HISTORY)) || [];
+    shiftReport = JSON.parse(localStorage.getItem(KEY_SHIFT)) || {};
+  } catch (e) {
+    console.warn("Failed to load saved data:", e);
+    accounts = transactions = stock = stockHistory = [];
+    shiftReport = {};
+  }
+}
+
+/* ======= Initialization on load ======= */
+window.addEventListener("load", () => {
+  loadAll();
+  updateAccountUI();
+  updateTransactionUI();
+  updateStockUI();
+  updateCharts();
+});
+
+/* ==========================
+   Accounts
+   ========================== */
+function addAccount() {
+  const name = document.getElementById("accountName").value.trim();
+  const type = document.getElementById("accountType").value;
+  if (!name) { alert("Enter account name"); return; }
+  if (accounts.some(a => a.name === name)) { alert("Account already exists"); return; }
+  accounts.push({ name, type });
+  saveAll();
+  updateAccountUI();
+  document.getElementById("accountName").value = "";
+}
+
+function clearAccounts() {
+  if (!confirm("Clear all accounts? This will not remove transactions but may make them inconsistent.")) return;
+  accounts = [];
+  saveAll();
+  updateAccountUI();
+  updateTransactionUI();
+}
+
+function updateAccountUI() {
+  const list = document.getElementById("accountsList");
+  const debitSelect = document.getElementById("debitAccount");
+  const creditSelect = document.getElementById("creditAccount");
+  list.innerHTML = "";
+  debitSelect.innerHTML = "";
+  creditSelect.innerHTML = "";
+  accounts.forEach(acc => {
+    const li = document.createElement("li");
+    li.textContent = `${acc.name} (${acc.type})`;
+    list.appendChild(li);
+    [debitSelect, creditSelect].forEach(sel => {
+      const opt = document.createElement("option");
+      opt.value = acc.name;
+      opt.textContent = acc.name;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function getAccountType(name) {
+  const a = accounts.find(x => x.name === name);
+  return a ? a.type : null;
+}
