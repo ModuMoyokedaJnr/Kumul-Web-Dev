@@ -1,0 +1,14 @@
+
+/* ==========================
+   UI + Charts
+   ========================== */
+function updateTransactionUI() {
+  const list = document.getElementById("transactionList");
+  list.innerHTML = "";
+  transactions.forEach(tx => {
+    const li = document.createElement("li");
+    li.textContent = `${tx.date} | ${tx.desc} | Debit: ${tx.debit} | Credit: ${tx.credit} | K${tx.amount}`;
+    list.appendChild(li);
+  });
+  updateCharts();
+}
