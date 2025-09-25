@@ -1,0 +1,20 @@
+/* ==========================
+   Stock management
+   - stock[] items shape:
+     { name, qty (current opening), price, closing (last closing qty|null) }
+   - stockHistory: array of { date, item, opening, closing, consumed, valueOpening, valueClosing }
+   ========================== */
+
+function addStockItem() {
+  const name = document.getElementById("itemName").value.trim();
+  const qty = parseInt(document.getElementById("itemQty").value, 10);
+  const price = parseFloat(document.getElementById("itemPrice").value);
+  if (!name || isNaN(qty) || isNaN(price)) { alert("Fill all stock fields"); return; }
+  if (stock.find(s => s.name === name)) { alert("Item exists - use balance/closing to update"); return; }
+  stock.push({ name, qty, price, closing: null });
+  saveAll();
+  updateStockUI();
+  document.getElementById("itemName").value = "";
+  document.getElementById("itemQty").value = "";
+  document.getElementById("itemPrice").value = "";
+}
