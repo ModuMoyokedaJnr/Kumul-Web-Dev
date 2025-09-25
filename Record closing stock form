@@ -1,0 +1,26 @@
+/* Record closing stock via separate form.
+   - store history entry (opening, closing, consumed, values)
+   - update item.closing and roll closing qty into next opening (auto roll-over)
+*/
+function recordClosingStock() {
+  const name = document.getElementById("closingItemName").value.trim();
+  const closingQty = parseInt(document.getElementById("closingQty").value, 10);
+  if (!name || isNaN(closingQty)) { alert("Enter item and closing qty"); return; }
+  const item = stock.find(s => s.name === name);
+  if (!item) { alert("Item not found"); return; }
+  const date = new Date().toISOString().slice(0,10);
+  const openingQty = (typeof item.qty === "number") ? item.qty : 0;
+  const consumed = openingQty - closingQty;
+  const valueOpening = openingQty * item.price;
+  const valueClosing = closingQty * item.price;
+  // push history
+  stockHistory.push({ date, item: name, opening: openingQty, closing: closingQty, consumed, valueOpening, valueClosing });
+  // set closing and roll to opening for next day
+  item.closing = closingQty;
+  item.qty = closingQty; // roll-over: closing becomes next opening
+  saveAll();
+  updateStockUI();
+  alert(`Closing recorded for ${name}. Consumed: ${consumed}`);
+  document.getElementById("closingItemName").value = "";
+  document.getElementById("closingQty").value = "";
+}
