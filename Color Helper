@@ -1,0 +1,9 @@
+function sliceColorByTransaction (tx) {
+    const dt = getAccountType(tx.debit);
+    const ct = getAccountType(tx.credit);
+    if (dt === "Expense") return "#ef5350";
+    if (ct === "Revenue") return "#43a047";
+    if (dt === "Asset") return "#42a5f5";
+    if (dt === "Liability") return "#e53935";
+    if (dt === "Equity") return "#8e24aa";
+}
