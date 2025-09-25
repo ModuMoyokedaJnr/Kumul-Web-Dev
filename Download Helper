@@ -1,0 +1,30 @@
+/* Download helpers */
+function downloadChart(canvas, filename) {
+  const link = document.createElement("a");
+  link.download = filename + ".png";
+  link.href = canvas.toDataURL("image/png", 1);
+  link.click();
+}
+function downloadAllCharts() {
+  charts.forEach((c,i) => downloadChart(c.canvas, `Chart-${i+1}`));
+  if (allTimeChart) downloadChart(allTimeChart.canvas, "AllTimeChart");
+}
+function downloadChartsPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  let y = 10;
+  const toAdd = [...charts]; if (allTimeChart) toAdd.push(allTimeChart);
+  if (!toAdd.length) return alert("No charts to export.");
+  toAdd.forEach(chart => {
+    const img = chart.toBase64Image();
+    const props = pdf.getImageProperties(img);
+    const w = pageW - 20;
+    const h = (props.height * w) / props.width;
+    if (y + h > pageH) { pdf.addPage(); y = 10; }
+    pdf.addImage(img, "PNG", 10, y, w, h);
+    y += h + 8;
+  });
+  pdf.save("AllCharts.pdf");
+}
