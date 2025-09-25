@@ -1,0 +1,100 @@
+/* Update charts: daily pies (transactions slices), all-time pie */
+function updateCharts() {
+  const container = document.getElementById("chartsContainer");
+  container.innerHTML = "";
+  charts.forEach(c => c.destroy?.()); charts = [];
+
+  // group by date
+  const grouped = {};
+  transactions.forEach(tx => {
+    if (!grouped[tx.date]) grouped[tx.date] = [];
+    grouped[tx.date].push(tx);
+  });
+
+  Object.keys(grouped).sort().forEach(date => {
+    const dayTx = grouped[date];
+    const labels = dayTx.map(t => t.desc);
+    const data = dayTx.map(t => t.amount);
+    const colors = dayTx.map(t => sliceColorByTransaction(t));
+
+    const card = document.createElement("div"); card.className = "chartCard";
+    const title = document.createElement("h4"); title.textContent = `Transactions Pie — ${date}`;
+    card.appendChild(title);
+    const canvas = document.createElement("canvas");
+    card.appendChild(canvas);
+
+    const btn = document.createElement("button");
+    btn.textContent = "Download Pie";
+    btn.className = "downloadBtn";
+    btn.onclick = () => downloadChart(canvas, `Pie-${date}`);
+    card.appendChild(btn);
+
+    container.appendChild(card);
+
+    const pie = new Chart(canvas.getContext("2d"), {
+      type: "pie",
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 1 }] },
+      options: {
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { callbacks: { label: ctx => {
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            const pct = total ? ((ctx.raw/total)*100).toFixed(2) : "0.00";
+            return `${ctx.label}: K${ctx.raw} (${pct}%)`;
+          } } },
+          datalabels: { color: "#fff", font:{weight:"bold",size:12}, formatter:(v,ctx)=> {
+            const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return total?((v/total)*100).toFixed(1)+'%':''; } }
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+    charts.push(pie);
+  });
+
+  // all-time
+  const balances = buildAllTimeBalances();
+  const labels = [], data = [], colors = [];
+  const pickers = {
+    Asset: colorForType("Asset"),
+    Liability: colorForType("Liability"),
+    Equity: colorForType("Equity"),
+    Revenue: colorForType("Revenue"),
+    Expense: colorForType("Expense")
+  };
+  const colorIndex = {}; // cycle each type
+  accounts.forEach(acc => {
+    const bal = balances[acc.name] || 0;
+    if (bal !== 0) {
+      labels.push(`${acc.name} (${acc.type})`);
+      data.push(Math.abs(bal));
+      const arr = pickers[acc.type] || ["#b0bec5"];
+      colorIndex[acc.type] = (colorIndex[acc.type] || 0) % arr.length;
+      colors.push(arr[colorIndex[acc.type]]);
+      colorIndex[acc.type] += 1;
+    }
+  });
+
+  const allTimeCtx = document.getElementById("allTimeChart").getContext("2d");
+  if (allTimeChart) allTimeChart.destroy();
+  if (labels.length) {
+    allTimeChart = new Chart(allTimeCtx, {
+      type: "pie",
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 1 }] },
+      options: {
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { callbacks: { label: ctx => {
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            const pct = total?((ctx.raw/total)*100).toFixed(2):"0.00";
+            return `${ctx.label}: K${ctx.raw} (${pct}%)`;
+          } } },
+          datalabels: { color:"#fff", font:{weight:"bold",size:12}, formatter:(v,ctx) => {
+            const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+            return total?((v/total)*100).toFixed(1)+'%':'';
+          } }
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+  }
+}
