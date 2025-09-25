@@ -1,0 +1,9 @@
+/* Build balances for all-time chart */
+function buildAllTimeBalances(){
+    const b = {};
+    accounts.forEach(a => b[a.name] = 0);
+    transation.forEach(tx => {
+        b[tx.debit] += tx.amount;
+        b[tx.credit] -= tx.amount;
+    })
+}
