@@ -1,0 +1,13 @@
+/* Quick balance update (use during counting) */
+function updateStockBalance() {
+  const name = document.getElementById("balanceItemName").value.trim();
+  const counted = parseInt(document.getElementById("balanceQty").value, 10);
+  if (!name || isNaN(counted)) { alert("Enter name and counted qty"); return; }
+  const item = stock.find(s => s.name === name);
+  if (!item) { alert("Item not found"); return; }
+  const variance = counted - item.qty;
+  item.qty = counted;
+  saveAll();
+  updateStockUI();
+  alert(`Balance updated for ${name}. Variance: ${variance >= 0 ? "+" : ""}${variance}`);
+}
