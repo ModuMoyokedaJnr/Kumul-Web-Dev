@@ -1,0 +1,17 @@
+function updateStockUI() {
+  const list = document.getElementById("stockList");
+  const summary = document.getElementById("stockSummary");
+  const report = document.getElementById("stockReport");
+  list.innerHTML = "";
+  summary.innerHTML = "";
+  report.innerHTML = "";
+
+  let totalValue = 0;
+  stock.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} | Opening (current): ${item.qty} | Unit Price: K${item.price} | Closing (last): ${item.closing ?? "N/A"}`;
+    list.appendChild(li);
+    totalValue += item.qty * item.price;
+  });
+
+  summary.innerHTML = `<h3>Stock Summary</h3>Total Items: ${stock.length}<br>Total Value (opening * price): K${totalValue.toFixed(2)}`;
