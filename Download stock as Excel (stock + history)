@@ -1,0 +1,10 @@
+function downloadStockExcel() {
+  const wb = XLSX.utils.book_new();
+  const stockSheet = XLSX.utils.json_to_sheet(stock.map(s => ({
+    name: s.name, opening_qty: s.qty, unit_price: s.price, last_closing: s.closing
+  })));
+  const histSheet = XLSX.utils.json_to_sheet(stockHistory);
+  XLSX.utils.book_append_sheet(wb, stockSheet, "Stock");
+  XLSX.utils.book_append_sheet(wb, histSheet, "StockHistory");
+  XLSX.writeFile(wb, "StockReport.xlsx");
+}
