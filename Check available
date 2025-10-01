@@ -1,0 +1,7 @@
+function checkAvailableStock() {
+  const name = document.getElementById("availableItemName").value.trim();
+  if (!name) { alert("Enter item name"); return; }
+  const item = stock.find(s => s.name === name);
+  if (!item) { alert("Item not found"); return; }
+  document.getElementById("availableResult").textContent = `Available: ${item.qty} units (Unit price: K${item.price})`;
+}
