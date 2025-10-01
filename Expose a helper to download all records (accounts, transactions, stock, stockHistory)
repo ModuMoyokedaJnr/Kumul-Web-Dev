@@ -1,0 +1,8 @@
+function downloadAllRecords() {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(accounts), "Accounts");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(transactions), "Transactions");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stock), "Stock");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stockHistory), "StockHistory");
+  XLSX.writeFile(wb, "AllRecords.xlsx");
+}
