@@ -1,0 +1,7 @@
+function resetStock() {
+  if (!confirm("Reset stock and history?")) return;
+  stock = [];
+  stockHistory = [];
+  saveAll();
+  updateStockUI();
+}
