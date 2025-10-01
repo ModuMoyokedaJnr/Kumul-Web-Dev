@@ -1,0 +1,20 @@
+let reportHtml = "<h3>Stock Take Report & Working Out</h3>";
+  if (stockHistory.length === 0) {
+    reportHtml += "<em>No closing stock records yet.</em>";
+  } else {
+    // latest per item
+    const grouped = {};
+    stockHistory.slice().reverse().forEach(h => { // reverse so newest first
+      if (!grouped[h.item]) grouped[h.item] = [];
+      grouped[h.item].push(h);
+    });
+    Object.keys(grouped).forEach(itemName => {
+      reportHtml += `<strong>${itemName}</strong><br>`;
+      grouped[itemName].forEach(h => {
+        reportHtml += `- ${h.date}: Opening ${h.opening} (K${h.valueOpening.toFixed(2)}) — Closing ${h.closing} (K${h.valueClosing.toFixed(2)}) — Consumed ${h.consumed}<br>`;
+      });
+      reportHtml += `<br>`;
+    });
+  }
+  report.innerHTML = reportHtml;
+}
