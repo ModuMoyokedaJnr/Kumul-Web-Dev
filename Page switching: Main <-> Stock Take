@@ -1,0 +1,87 @@
+function showStockTake() {
+  document.getElementById("accountsSection").style.display = "none";
+  document.getElementById("transactionSection").style.display = "none";
+  document.getElementById("chartsSection").style.display = "none";
+  document.getElementById("stockTakeSection").style.display = "block";
+}
+
+function showMainPage() {
+  document.getElementById("accountsSection").style.display = "block";
+  document.getElementById("transactionSection").style.display = "block";
+  document.getElementById("chartsSection").style.display = "block";
+  document.getElementById("stockTakeSection").style.display = "none";
+}
+
+function setCashOnHand() {
+  const val = parseFloat(document.getElementById("cashOnHandInput").value);
+  if (isNaN(val) || val < 0) { alert("Enter valid cash amount"); return; }
+  cashOnHand = val;
+  saveAll();
+  updateCashSummary();
+  updateCashTable();
+}
+
+function updateCashSummary() {
+  document.getElementById("cashSummary").innerHTML = 
+    `<strong>Cash on Hand:</strong> K${cashOnHand.toFixed(2)}`;
+}
+
+function updateCashTable() {
+  const tbody = document.querySelector("#cashTable tbody");
+  tbody.innerHTML = "";
+
+  let balance = cashOnHand;
+  transactions.forEach(tx => {
+    // Only subtract if transaction is an Expense
+    if (getAccountType(tx.debit) === "Expense") {
+      balance -= tx.amount;
+    }
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${tx.date}</td>
+      <td>${tx.desc}</td>
+      <td>${tx.debit}</td>
+      <td>${tx.credit}</td>
+      <td>K${tx.amount.toFixed(2)}</td>
+      <td>K${balance.toFixed(2)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function saveAll() {
+  localStorage.setItem(KEY_ACCOUNTS, JSON.stringify(accounts));
+  localStorage.setItem(KEY_TRANSACTIONS, JSON.stringify(transactions));
+  localStorage.setItem(KEY_STOCK, JSON.stringify(stock));
+  localStorage.setItem(KEY_STOCK_HISTORY, JSON.stringify(stockHistory));
+  localStorage.setItem(KEY_SHIFT, JSON.stringify(shiftReport));
+  localStorage.setItem("cashOnHand", cashOnHand);
+}
+
+function loadAll() {
+  try {
+    accounts = JSON.parse(localStorage.getItem(KEY_ACCOUNTS)) || [];
+    transactions = JSON.parse(localStorage.getItem(KEY_TRANSACTIONS)) || [];
+    stock = JSON.parse(localStorage.getItem(KEY_STOCK)) || [];
+    stockHistory = JSON.parse(localStorage.getItem(KEY_STOCK_HISTORY)) || [];
+    shiftReport = JSON.parse(localStorage.getItem(KEY_SHIFT)) || {};
+    cashOnHand = parseFloat(localStorage.getItem("cashOnHand")) || 0;
+  } catch (e) {
+    accounts = transactions = stock = stockHistory = [];
+    shiftReport = {};
+    cashOnHand = 0;
+  }
+}
+
+function updateTransactionUI() {
+  const list = document.getElementById("transactionList");
+  list.innerHTML = "";
+  transactions.forEach(tx => {
+    const li = document.createElement("li");
+    li.textContent = `${tx.date} | ${tx.desc} | Debit: ${tx.debit} | Credit: ${tx.credit} | K${tx.amount}`;
+    list.appendChild(li);
+  });
+  updateCharts();
+  updateCashSummary();
+  updateCashTable();
+}
