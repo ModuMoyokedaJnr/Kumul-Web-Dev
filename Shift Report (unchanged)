@@ -1,0 +1,53 @@
+function generateShiftReport() {
+  const date = document.getElementById("shiftDate").value;
+  const shiftTime = document.getElementById("shiftTime").value;
+  const employee = document.getElementById("employeeName").value;
+  const openingCash = parseFloat(document.getElementById("openingCash").value) || 0;
+  const sales = parseFloat(document.getElementById("cashSales").value) || 0;
+  const payments = parseFloat(document.getElementById("cashPayments").value) || 0;
+  const actualCash = parseFloat(document.getElementById("actualCash").value) || 0;
+  const expectedCash = openingCash + sales - payments;
+  const variance = expectedCash - actualCash;
+
+  const html = `
+    <h3>End-of-Shift Cash Reconciliation</h3>
+    <strong>Date:</strong> ${date}<br>
+    <strong>Shift:</strong> ${shiftTime}<br>
+    <strong>Employee:</strong> ${employee}<br><br>
+    <strong>Opening Cash (Float):</strong> K${openingCash.toFixed(2)}<br>
+    <strong>Total Cash Receipts/Sales:</strong> K${sales.toFixed(2)}<br>
+    <strong>Total Cash Disbursements/Payments:</strong> K${payments.toFixed(2)}<br>
+    <strong>Expected Cash on Hand:</strong> K${expectedCash.toFixed(2)}<br>
+    <strong>Actual Cash on Hand:</strong> K${actualCash.toFixed(2)}<br>
+    <strong>Variance:</strong> K${variance.toFixed(2)}<br>
+    <strong>Notes/Comments:</strong> ____________________________<br>
+  `;
+
+  document.getElementById("shiftReportContainer").innerHTML = html;
+  shiftReport = { date, shiftTime, employee, openingCash, sales, payments, actualCash, expectedCash, variance };
+  saveAll();
+}
+
+function downloadShiftPDF() {
+  if (!shiftReport.date) return alert("Generate the shift report first");
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 10;
+  pdf.setFontSize(14); pdf.text("End-of-Shift Cash Reconciliation", 10, y); y += 10;
+  pdf.setFontSize(12);
+  Object.entries(shiftReport).forEach(([k, v]) => { pdf.text(`${k}: ${v}`, 10, y); y += 8; });
+  pdf.save(`Shift-${shiftReport.date}.pdf`);
+}
+
+function downloadShiftWord() {
+  if (!shiftReport.date) return alert("Generate the shift report first");
+  let content = `<html><head><meta charset="utf-8"><title>Shift Report</title></head><body>`;
+  content += `<h2>End-of-Shift Cash Reconciliation</h2>`;
+  Object.entries(shiftReport).forEach(([k, v]) => { content += `<strong>${k}:</strong> ${v}<br>`; });
+  content += `</body></html>`;
+  const blob = new Blob([content], { type: "application/msword" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `Shift-${shiftReport.date}.doc`;
+  link.click();
+}
