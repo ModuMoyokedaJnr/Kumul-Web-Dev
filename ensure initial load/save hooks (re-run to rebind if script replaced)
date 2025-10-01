@@ -1,0 +1,5 @@
+loadAll();
+updateAccountUI();
+updateTransactionUI();
+updateStockUI();
+updateCharts();
