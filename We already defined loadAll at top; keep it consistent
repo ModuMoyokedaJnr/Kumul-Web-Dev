@@ -1,0 +1,12 @@
+function loadAll() {
+  try {
+    accounts = JSON.parse(localStorage.getItem(KEY_ACCOUNTS)) || [];
+    transactions = JSON.parse(localStorage.getItem(KEY_TRANSACTIONS)) || [];
+    stock = JSON.parse(localStorage.getItem(KEY_STOCK)) || [];
+    stockHistory = JSON.parse(localStorage.getItem(KEY_STOCK_HISTORY)) || [];
+    shiftReport = JSON.parse(localStorage.getItem(KEY_SHIFT)) || {};
+  } catch (e) {
+    accounts = transactions = stock = stockHistory = [];
+    shiftReport = {};
+  }
+}
