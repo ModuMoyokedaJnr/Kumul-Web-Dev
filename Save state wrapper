@@ -1,0 +1,7 @@
+function saveAll() {
+  localStorage.setItem(KEY_ACCOUNTS, JSON.stringify(accounts));
+  localStorage.setItem(KEY_TRANSACTIONS, JSON.stringify(transactions));
+  localStorage.setItem(KEY_STOCK, JSON.stringify(stock));
+  localStorage.setItem(KEY_STOCK_HISTORY, JSON.stringify(stockHistory));
+  localStorage.setItem(KEY_SHIFT, JSON.stringify(shiftReport));
+}
