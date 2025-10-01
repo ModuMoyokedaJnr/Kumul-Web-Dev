@@ -1,0 +1,22 @@
+function downloadStockPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 12;
+  pdf.setFontSize(14);
+  pdf.text("Stock Report", 10, y); y += 8;
+  pdf.setFontSize(11);
+  stock.forEach(item => {
+    pdf.text(`${item.name} — Opening: ${item.qty} — Unit: K${item.price} — Last Closing: ${item.closing ?? "N/A"}`, 10, y);
+    y += 6;
+    if (y > 270) { pdf.addPage(); y = 12; }
+  });
+  y += 6;
+  pdf.setFontSize(12);
+  pdf.text("Stock History (latest first)", 10, y); y += 8;
+  stockHistory.slice().reverse().forEach(h => {
+    const line = `${h.date} | ${h.item} | Opening:${h.opening} Closing:${h.closing} Consumed:${h.consumed} ValueOpen:K${h.valueOpening.toFixed(2)} ValueClose:K${h.valueClosing.toFixed(2)}`;
+    pdf.text(line, 10, y); y += 6;
+    if (y > 270) { pdf.addPage(); y = 12; }
+  });
+  pdf.save("StockReport.pdf");
+}
